@@ -1,12 +1,14 @@
 // Trong ManageUsersScreen.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Button,StyleSheet,Alert , TextInput} from 'react-native';
-import { getAllUsers, updateUser, deleteUser } from './Database'; // Thay đổi path tùy thuộc vào cấu trúc dự án của bạn
+import { getAllUsers, updateUser, deleteUser,searchUser } from './Database'; // Thay đổi path tùy thuộc vào cấu trúc dự án của bạn
 
 const ManageUsersScreen = () => {
   const [users, setUsers] = useState([]);
   const [newUsername, setnewUsername] = useState('');
   const [newPassword, setnewPassword] = useState('');
+  const [search, setSearch] = useState('');
+  
   useEffect(() => {
     // Gọi hàm lấy tất cả người dùng từ cơ sở dữ liệu SQLite
     const fetchUsers = async () => {
@@ -83,9 +85,48 @@ const ManageUsersScreen = () => {
     }
   };
 
+  const handleSearchUser = async (search) => {
+    try {
+      // Gọi hàm xóa người dùng từ cơ sở dữ liệu SQLite
+      await searchUser(search);
+      Alert.alert(
+        'Thông báo',
+        'Tìm thành công!',
+        [
+          {
+            text: 'Đóng',
+           
+            style: 'cancel',
+          },
+        ],
+        {
+          cancelable: true,
+          onDismiss: () =>
+            Alert.alert(
+              'This alert was dismissed by tapping outside of the alert dialog.',
+            ),
+        },
+      );
+      console.log('User search successfully!');
+      // Cập nhật lại danh sách người dùng
+      
+    } catch (error) {
+      console.error('Error search user: ', error);
+    }
+  };
   return (
     <View style={styles.container}>
     <Text style={styles.title}>Manage Users Screen</Text>
+    <TextInput
+            style={styles.input}
+            placeholder="Search User"
+            onChangeText={text => setSearch(text)}
+            value={search}
+          />
+          <View style={styles.buttonContainer}>
+           
+            <Button title="Seacrh" onPress={() => handleSearchUser(search)} />
+          </View>
     <FlatList
       data={users}
       keyExtractor={(item) => item.id.toString()}
@@ -106,7 +147,8 @@ const ManageUsersScreen = () => {
             onChangeText={text => setnewPassword(text)}
             value={newPassword}
           />
-         <View style={styles.buttonContainer}>
+          
+          <View style={styles.buttonContainer}>
             <Button
               title="Update"
               onPress={() => handleUpdateUser(item.id, newUsername, newPassword)}

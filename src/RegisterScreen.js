@@ -28,6 +28,24 @@ const RegisterScreen = ({ navigation }) => {
         },
       );
     } catch (error) {
+      Alert.alert(
+        'Thông báo',
+        'Tài khoản đã tồn tại!',
+        [
+          {
+            text: 'Đóng',
+            // onPress: () => navigation.navigate('ManageUsers'),
+            style: 'cancel',
+          },
+        ],
+        {
+          cancelable: true,
+          onDismiss: () =>
+            Alert.alert(
+              'This alert was dismissed by tapping outside of the alert dialog.',
+            ),
+        },
+      );
       console.error('Error registering user: ', error);
     }
   };

@@ -10,7 +10,7 @@ db.transaction(tx => {
 });
 db.transaction((tx) => {
   tx.executeSql(
-    'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT);'
+    'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT);'
   );
 });
 
@@ -129,15 +129,37 @@ export const deleteUser = (id) => {
   });
 };
 
-const searchUser = () => {
-  db.transaction(tx => {
-    tx.executeSql(
-      'SELECT * FROM users WHERE name LIKE ? OR email LIKE ?',
-      [`%${search}%`, `%${search}%`],
-      (_, { rows }) => {
-        setUsers(rows._array);
+// Hàm tìm người dùng
+export const searchUser = (search) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          'SELECT * FROM users WHERE username LIKE ? OR id LIKE ?',
+          [`%${search}%`, `%${search}%`],
+          (_, results) => {
+            resolve(results.rows._array);
+          },
+          (_, error) => {
+            reject(error);
+          }
+        );
+      },
+      (error) => {
+        reject(error);
       }
     );
   });
 };
-// Tương tự, bạn có thể tạo các hàm updateUser, deleteUser và findUser
+
+// const searchU = () => {
+//   db.transaction(tx => {
+//     tx.executeSql(
+//       'SELECT * FROM users WHERE name LIKE ? OR email LIKE ?',
+//       [`%${search}%`, `%${search}%`],
+//       (_, { rows }) => {
+//         setUsers(rows._array);
+//       }
+//     );
+//   });
+// };
